@@ -15,6 +15,7 @@ const fs      = require('fs');
 const app  = express();
 const PORT = process.env.PORT || 8000;
 
+app.enable('trust proxy');
 app.use(cors());
 app.use(express.json({ limit: '50mb' }));
 app.use(express.urlencoded({ limit: '50mb', extended: true }));
@@ -122,7 +123,7 @@ route(app, 'post', '/api/upload.php', upload.single('file'), (req, res) => {
     if (!req.file) {
         return res.status(400).json({ success: false, message: 'No file uploaded' });
     }
-    const fileUrl = `http://localhost:${PORT}/uploads/${req.file.filename}`;
+    const fileUrl = `${req.protocol}://${req.get('host')}/uploads/${req.file.filename}`;
     res.json({ success: true, url: fileUrl });
 });
 
@@ -130,7 +131,7 @@ route(app, 'post', '/api/upload-file.php', upload.single('file'), (req, res) => 
     if (!req.file) {
         return res.status(400).json({ success: false, message: 'No file uploaded' });
     }
-    const fileUrl = `http://localhost:${PORT}/uploads/${req.file.filename}`;
+    const fileUrl = `${req.protocol}://${req.get('host')}/uploads/${req.file.filename}`;
     res.json({ success: true, url: fileUrl });
 });
 
