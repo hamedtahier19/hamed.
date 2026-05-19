@@ -176,10 +176,16 @@ route(app, 'delete', '/api/news.php', async (req, res) => {
 });
 
 // ――― الإعلانات ―――
-route(app, 'get', '/api/announcements.php', async (_req, res) => {
+route(app, 'get', '/api/announcements.php', async (req, res) => {
+    const { id } = req.query;
     try {
-        const rows = await db.all('SELECT * FROM announcements ORDER BY created_at DESC');
-        res.json(rows);
+        if (id) {
+            const row = await db.get('SELECT * FROM announcements WHERE id = ?', [id]);
+            res.json(row || { error: 'Not found' });
+        } else {
+            const rows = await db.all('SELECT * FROM announcements ORDER BY created_at DESC');
+            res.json(rows);
+        }
     } catch (e) { res.status(500).json({ error: e.message }); }
 });
 
@@ -193,15 +199,26 @@ route(app, 'post', '/api/announcements.php', async (req, res) => {
 });
 
 // ――― المقالات العلمية ―――
-route(app, 'get', '/api/articles.php', async (_req, res) => {
+route(app, 'get', '/api/articles.php', async (req, res) => {
+    const { id } = req.query;
     try {
-        const rows = await db.all(`
-            SELECT a.*, u.name AS author_name
-            FROM articles a
-            LEFT JOIN users u ON a.author_id = u.id
-            ORDER BY a.created_at DESC
-        `);
-        res.json(rows);
+        if (id) {
+            const row = await db.get(`
+                SELECT a.*, u.name AS author_name
+                FROM articles a
+                LEFT JOIN users u ON a.author_id = u.id
+                WHERE a.id = ?
+            `, [id]);
+            res.json(row || { error: 'Not found' });
+        } else {
+            const rows = await db.all(`
+                SELECT a.*, u.name AS author_name
+                FROM articles a
+                LEFT JOIN users u ON a.author_id = u.id
+                ORDER BY a.created_at DESC
+            `);
+            res.json(rows);
+        }
     } catch (e) { res.status(500).json({ error: e.message }); }
 });
 
@@ -217,10 +234,16 @@ route(app, 'post', '/api/articles.php', async (req, res) => {
 });
 
 // ――― مشاريع التخرج ―――
-route(app, 'get', '/api/projects.php', async (_req, res) => {
+route(app, 'get', '/api/projects.php', async (req, res) => {
+    const { id } = req.query;
     try {
-        const rows = await db.all('SELECT * FROM projects ORDER BY year DESC, created_at DESC');
-        res.json(rows);
+        if (id) {
+            const row = await db.get('SELECT * FROM projects WHERE id = ?', [id]);
+            res.json(row || { error: 'Not found' });
+        } else {
+            const rows = await db.all('SELECT * FROM projects ORDER BY year DESC, created_at DESC');
+            res.json(rows);
+        }
     } catch (e) { res.status(500).json({ error: e.message }); }
 });
 
