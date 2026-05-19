@@ -1,0 +1,137 @@
+.header {
+    background-color: var(--color-dark);
+    color: var(--color-white);
+    padding: 1.25rem 0;
+    position: relative;
+    z-index: 1000;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.header-content {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.logo-container {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+}
+
+.logo-icon {
+    background-color: var(--color-primary);
+    padding: 6px;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    width: 38px;
+    height: 38px;
+}
+
+.logo-text {
+    display: flex;
+    flex-direction: column;
+    line-height: 1.1;
+}
+
+.logo-text h1 {
+    font-size: 1.4rem;
+    font-weight: 800;
+}
+
+.logo-text span {
+    font-size: 0.7rem;
+    opacity: 0.7;
+    font-weight: 400;
+}
+
+.nav-menu ul {
+    display: flex;
+    gap: 1.5rem;
+}
+
+.nav-menu a {
+    font-size: 1rem;
+    font-weight: 600;
+    transition: color 0.3s;
+    opacity: 0.85;
+}
+
+.nav-menu a:hover,
+.nav-menu a.active {
+    color: var(--color-primary);
+    opacity: 1;
+}
+
+.nav-menu a.active {
+    position: relative;
+}
+
+.nav-menu a.active::after {
+    content: '';
+    position: absolute;
+    bottom: -8px;
+    left: 0;
+    width: 100%;
+    height: 3px;
+    background-color: var(--color-primary);
+    border-radius: 2px;
+}
+
+.header-actions {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.icon-btn {
+    background: rgba(255, 255, 255, 0.05);
+    color: white;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s;
+}
+
+.icon-btn:hover {
+    background: var(--color-primary);
+}
+
+.mobile-menu-btn {
+    display: none;
+}
+
+@media (max-width: 1024px) {
+    .nav-menu {
+        display: none;
+    }
+    
+    .mobile-menu-btn {
+        display: flex;
+    }
+}
+
+@media (max-width: 768px) {
+    .nav-menu.open {
+        display: block;
+        position: absolute;
+        top: 100%;
+        right: 0;
+        left: 0;
+        background-color: var(--color-dark);
+        padding: 2rem;
+        border-top: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .nav-menu ul {
+        flex-direction: column;
+        gap: 1.5rem;
+        text-align: center;
+    }
+}
