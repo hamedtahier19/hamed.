@@ -25,4 +25,5 @@ dist-ssr
 
 # Database and local uploads
 database.sqlite
+db_config.json
 uploads/
