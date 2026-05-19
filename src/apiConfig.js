@@ -2,6 +2,6 @@
 const API_BASE_URL =
     import.meta.env.MODE === "development"
         ? "http://localhost:8000/api"
-        : "https://moom22.hstn.me/backend/api";
+        : "https://hamed-vpg9.onrender.com/api";
 
 export default API_BASE_URL;
