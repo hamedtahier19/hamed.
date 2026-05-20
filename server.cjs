@@ -108,8 +108,8 @@ const pool = mysql.createPool({
                 title VARCHAR(255) NOT NULL,
                 summary TEXT,
                 content TEXT,
-                image VARCHAR(255),
-                file_url VARCHAR(255),
+                image LONGTEXT,
+                file_url LONGTEXT,
                 author_id INT,
                 created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
             ) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
@@ -121,8 +121,8 @@ const pool = mysql.createPool({
                 id INT AUTO_INCREMENT PRIMARY KEY,
                 title VARCHAR(255) NOT NULL,
                 content TEXT,
-                image VARCHAR(255),
-                file_url VARCHAR(255),
+                image LONGTEXT,
+                file_url LONGTEXT,
                 created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
             ) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
         `);
@@ -135,8 +135,8 @@ const pool = mysql.createPool({
                 summary TEXT,
                 content TEXT,
                 author_id INT,
-                image VARCHAR(255),
-                file_url VARCHAR(255),
+                image LONGTEXT,
+                file_url LONGTEXT,
                 created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
             ) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
         `);
@@ -149,8 +149,8 @@ const pool = mysql.createPool({
                 description TEXT,
                 student_name VARCHAR(255) NOT NULL,
                 year INT NOT NULL,
-                image VARCHAR(255),
-                file_url VARCHAR(255),
+                image LONGTEXT,
+                file_url LONGTEXT,
                 created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
             ) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
         `);
@@ -165,6 +165,17 @@ const pool = mysql.createPool({
                 created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
             ) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
         `);
+
+        // ――― هجرة تعديل الأعمدة لـ LONGTEXT لقاعدة البيانات السحابية الحالية ―――
+        try {
+            await pool.query('ALTER TABLE news MODIFY COLUMN image LONGTEXT, MODIFY COLUMN file_url LONGTEXT;');
+            await pool.query('ALTER TABLE announcements MODIFY COLUMN image LONGTEXT, MODIFY COLUMN file_url LONGTEXT;');
+            await pool.query('ALTER TABLE articles MODIFY COLUMN image LONGTEXT, MODIFY COLUMN file_url LONGTEXT;');
+            await pool.query('ALTER TABLE projects MODIFY COLUMN image LONGTEXT, MODIFY COLUMN file_url LONGTEXT;');
+            console.log('✅ تم تعديل الأعمدة إلى LONGTEXT بنجاح لتخزين الصور والملفات سحابياً!');
+        } catch (alterErr) {
+            console.log('ℹ️ الأعمدة معدلة بالفعل أو أن الجداول جديدة.');
+        }
         
         console.log('✅ جميع الجداول جاهزة في قاعدة البيانات السحابية!');
     } catch (err) {
@@ -184,16 +195,42 @@ route(app, 'post', '/api/upload.php', upload.single('file'), (req, res) => {
     if (!req.file) {
         return res.status(400).json({ success: false, message: 'No file uploaded' });
     }
-    const fileUrl = `${req.protocol}://${req.get('host')}/uploads/${req.file.filename}`;
-    res.json({ success: true, url: fileUrl });
+    try {
+        const filePath = req.file.path;
+        const fileBuffer = fs.readFileSync(filePath);
+        const mimeType = req.file.mimetype;
+        const base64Data = fileBuffer.toString('base64');
+        const dataUrl = `data:${mimeType};base64,${base64Data}`;
+
+        // مسح الملف المؤقت من السيرفر فوراً
+        fs.unlinkSync(filePath);
+
+        res.json({ success: true, url: dataUrl });
+    } catch (err) {
+        console.error('File conversion error:', err);
+        res.status(500).json({ success: false, message: 'Failed to process file' });
+    }
 });
 
 route(app, 'post', '/api/upload-file.php', upload.single('file'), (req, res) => {
     if (!req.file) {
         return res.status(400).json({ success: false, message: 'No file uploaded' });
     }
-    const fileUrl = `${req.protocol}://${req.get('host')}/uploads/${req.file.filename}`;
-    res.json({ success: true, url: fileUrl });
+    try {
+        const filePath = req.file.path;
+        const fileBuffer = fs.readFileSync(filePath);
+        const mimeType = req.file.mimetype;
+        const base64Data = fileBuffer.toString('base64');
+        const dataUrl = `data:${mimeType};base64,${base64Data}`;
+
+        // مسح الملف المؤقت من السيرفر فوراً
+        fs.unlinkSync(filePath);
+
+        res.json({ success: true, url: dataUrl });
+    } catch (err) {
+        console.error('File conversion error:', err);
+        res.status(500).json({ success: false, message: 'Failed to process file' });
+    }
 });
 
 // ――― أخبار الكلية ―――
