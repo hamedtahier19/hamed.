@@ -87,8 +87,31 @@ app.post('/api/announcements.php', async (req, res) => {
     }
 });
 
+app.put('/api/announcements.php', async (req, res) => {
+    const { id, title, content } = req.body;
+    try {
+        await pool.query(
+            'UPDATE announcements SET title=?, content=? WHERE id=?',
+            [title, content, id]
+        );
+        res.json({ status: 'success', message: 'تم تحديث الإعلان بنجاح' });
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
+});
+
+app.delete('/api/announcements.php', async (req, res) => {
+    const { id } = req.body;
+    try {
+        await pool.query('DELETE FROM announcements WHERE id=?', [id]);
+        res.json({ status: 'success', message: 'تم حذف الإعلان بنجاح' });
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
+});
+
 // ==========================================
-// API: المقالات العلمية  GET/POST /api/articles.php
+// API: المقالات العلمية  GET/POST/PUT/DELETE /api/articles.php
 // ==========================================
 app.get('/api/articles.php', async (req, res) => {
     try {
@@ -112,6 +135,29 @@ app.post('/api/articles.php', async (req, res) => {
             [title, summary, content, image || null, author_id || 1]
         );
         res.status(201).json({ status: 'success', message: 'تم نشر المقال بنجاح' });
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
+});
+
+app.put('/api/articles.php', async (req, res) => {
+    const { id, title, summary, content, image } = req.body;
+    try {
+        await pool.query(
+            'UPDATE articles SET title=?, summary=?, content=?, image=? WHERE id=?',
+            [title, summary || '', content, image || null, id]
+        );
+        res.json({ status: 'success', message: 'تم تحديث المقال بنجاح' });
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
+});
+
+app.delete('/api/articles.php', async (req, res) => {
+    const { id } = req.body;
+    try {
+        await pool.query('DELETE FROM articles WHERE id=?', [id]);
+        res.json({ status: 'success', message: 'تم حذف المقال بنجاح' });
     } catch (err) {
         res.status(500).json({ error: err.message });
     }

@@ -296,6 +296,23 @@ route(app, 'post', '/api/announcements.php', async (req, res) => {
     } catch (e) { res.status(500).json({ error: e.message }); }
 });
 
+route(app, 'put', '/api/announcements.php', async (req, res) => {
+    const { id, title, content, image, file_url } = req.body;
+    try {
+        await pool.query('UPDATE announcements SET title=?, content=?, image=?, file_url=? WHERE id=?',
+            [title, content, image || null, file_url || null, id]);
+        res.json({ status: 'success' });
+    } catch (e) { res.status(500).json({ error: e.message }); }
+});
+
+route(app, 'delete', '/api/announcements.php', async (req, res) => {
+    const { id } = req.body;
+    try {
+        await pool.query('DELETE FROM announcements WHERE id = ?', [id]);
+        res.json({ status: 'success' });
+    } catch (e) { res.status(500).json({ error: e.message }); }
+});
+
 // ――― المقالات العلمية ―――
 route(app, 'get', '/api/articles.php', async (req, res) => {
     const { id } = req.query;
@@ -328,6 +345,23 @@ route(app, 'post', '/api/articles.php', async (req, res) => {
             [title, summary, content, image || null, file_url || null, author_id || 1]
         );
         res.status(201).json({ status: 'success' });
+    } catch (e) { res.status(500).json({ error: e.message }); }
+});
+
+route(app, 'put', '/api/articles.php', async (req, res) => {
+    const { id, title, summary, content, image, file_url } = req.body;
+    try {
+        await pool.query('UPDATE articles SET title=?, summary=?, content=?, image=?, file_url=? WHERE id=?',
+            [title, summary || '', content, image || null, file_url || null, id]);
+        res.json({ status: 'success' });
+    } catch (e) { res.status(500).json({ error: e.message }); }
+});
+
+route(app, 'delete', '/api/articles.php', async (req, res) => {
+    const { id } = req.body;
+    try {
+        await pool.query('DELETE FROM articles WHERE id = ?', [id]);
+        res.json({ status: 'success' });
     } catch (e) { res.status(500).json({ error: e.message }); }
 });
 
